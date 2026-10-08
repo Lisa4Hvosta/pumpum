@@ -69,7 +69,7 @@ def test_form():
     # 4. Проверьте (assert), что поле Zip code подсвечено красным.
     zip_code_field = driver.find_element(By.ID, "zip-code")
     color_zip_code = zip_code_field.value_of_css_property("border-color")
-    assert color_zip_code == "rgb(245, 194, 199)" in color_zip_code
+    assert color_zip_code == "rgb(245, 194, 199)"
 
     # 5. Проверьте (assert), что остальные поля подсвечены зеленым.
     fields = [
