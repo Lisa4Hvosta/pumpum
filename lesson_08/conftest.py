@@ -39,11 +39,11 @@ def test_project(client):
     resp = client.post(url, json=payload)
 
     if resp.status_code != 201:
-        print("="*40)
+        print("=" * 40)
         print(f"💥 ОШИБКА СОЗДАНИЯ ПРОЕКТА: {resp.status_code}")
         print("Тело ответа:")
         print(resp.text)
-        print("="*40)
+        print("=" * 40)
         resp.raise_for_status()
 
     data = resp.json()
@@ -56,7 +56,6 @@ def test_project(client):
 
     if project_id:
         try:
-            # ✅ Гарантированно правильный путь удаления
             delete_url = f"{BASE_URL}/api-v2/projects/{project_id}"
             client.delete(delete_url)
             print(f"   🗑 Проект {project_id} успешно удален.")

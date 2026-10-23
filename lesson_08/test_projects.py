@@ -20,7 +20,6 @@ def test_post_projects_positive(client):
 
     resp = client.post(url, json=payload)
 
-    # Печатаем ответ, если что-то не так (для отладки)
     if resp.status_code != 201:
         print("-" * 50)
         print(f"❌ ОШИБКА: Ожидался 201, но получен {resp.status_code}")
@@ -30,7 +29,6 @@ def test_post_projects_positive(client):
     assert resp.status_code == 201, f"Ожидался 201, получен {resp.status_code}"
 
     data = resp.json()
-
     assert "id" in data, "В ответе сервера отсутствует поле 'id'"
     print(f"✅ Проект успешно создан с ID: {data['id']}")
 
@@ -56,7 +54,9 @@ def test_get_project_positive(test_project, client):
 
     assert resp.status_code == 200
     data = resp.json()
+
     assert data["id"] == project_id
+
     assert data.get("title") == test_project["title"], (
         f"Заголовки не совпадают! "
         f"Ожидалось: {test_project['title']}, "
@@ -82,7 +82,6 @@ def test_put_project_positive(test_project, client):
     assert resp.status_code == 200, f"Ожидался 200, получен {resp.status_code}"
 
     data = resp.json()
-
     assert "id" in data, "В ответе сервера отсутствует поле 'id'"
 
     print(f"✅ Проект {project_id} успешно обновлён.")
