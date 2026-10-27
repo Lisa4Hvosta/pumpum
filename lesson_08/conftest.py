@@ -41,7 +41,6 @@ def test_project(client):
     if resp.status_code != 201:
         print("=" * 40)
         print(f"💥 ОШИБКА СОЗДАНИЯ ПРОЕКТА: {resp.status_code}")
-        print("Тело ответа:")
         print(resp.text)
         print("=" * 40)
         resp.raise_for_status()
@@ -57,7 +56,14 @@ def test_project(client):
     if project_id:
         try:
             delete_url = f"{BASE_URL}/api-v2/projects/{project_id}"
-            client.delete(delete_url)
-            print(f"   🗑 Проект {project_id} успешно удален.")
+            resp_del = client.put(delete_url, json={"deleted": True})
+
+            if resp_del.status_code == 200:
+                print(f"Проект {project_id} успешно помечен как удаленный.")
+            else:
+                print(
+                    f"Не удалось пометить проект {project_id} как удаленный."
+                    f"Статус: {resp_del.status_code}, ответ: {resp_del.text}"
+                )
         except Exception as e:
-            print(f"⚠️ Не удалось удалить проект: {e}")
+            print(f"❌ Критическая ошибка при удалении: {e}")
