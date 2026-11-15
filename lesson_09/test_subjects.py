@@ -3,7 +3,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from models import Subject  # модель импортируем из models.py, а не дублируем
+from models import Subject
 
 DB_URL = "postgresql+psycopg2://postgres:test1@localhost:5433/postgres"
 
@@ -13,16 +13,12 @@ SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 @pytest.fixture
 def db():
-    """
-    Отдаёт сессию и список id, созданных тестом.
-    После теста (даже упавшего) — удаляет созданные строки из БД.
-    """
     session = SessionLocal()
     created_ids = []
     try:
         yield session, created_ids
     finally:
-        cleanup = SessionLocal()  # отдельная сессия, чтобы точно увидеть закоммиченное
+        cleanup = SessionLocal()
         try:
             for sid in created_ids:
                 obj = cleanup.get(Subject, sid)
@@ -39,14 +35,12 @@ def db():
 
 @pytest.fixture
 def subject_data():
-    """Уникальные id и название — тесты не конфликтуют между собой и при перезапуске."""
     rand_id = random.randint(1_000_000, 2_000_000_000)
     title = f"Test Subject {rand_id}"
     return rand_id, title
 
 
 def test_add_subject(db, subject_data):
-    """Добавление: запись появляется в БД."""
     session, created_ids = db
     sid, title = subject_data
 
@@ -60,7 +54,6 @@ def test_add_subject(db, subject_data):
 
 
 def test_update_subject(db, subject_data):
-    """Изменение: название реально меняется в БД."""
     session, created_ids = db
     sid, title = subject_data
     new_title = f"Updated {sid}"
@@ -73,19 +66,18 @@ def test_update_subject(db, subject_data):
     stored.subject_title = new_title
     session.commit()
 
-    fresh = session.get(Subject, sid)  # перечитываем из базы, а не из кеша
+    fresh = session.get(Subject, sid)
     session.expire_all()
     assert fresh.subject_title == new_title
 
 
 def test_delete_subject(db, subject_data):
-    """Удаление: запись исчезает из БД."""
     session, created_ids = db
     sid, title = subject_data
 
     session.add(Subject(subject_id=sid, subject_title=title))
     session.commit()
-    created_ids.append(sid)  # на случай падения до удаления — почистим в teardown
+    created_ids.append(sid)
 
     stored = session.get(Subject, sid)
     session.delete(stored)
